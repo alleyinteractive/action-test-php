@@ -66,7 +66,7 @@ runs:
   steps:
     - name: Generate extension hash per PHP version and extensions
       id: extension-hash
-      run: echo "::set-output name=hash::$(echo '${{ inputs.php-version }}-${{ inputs.php-extensions }}' | md5sum | cut -d ' ' -f 1)"
+      run: echo "hash=$(echo '${{ inputs.php-version }}-${{ inputs.php-extensions }}' | md5sum | cut -d ' ' -f 1)" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Setup cache environment
