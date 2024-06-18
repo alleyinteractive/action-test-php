@@ -1,0 +1,136 @@
+name: 'Run PHP tests'
+description: 'Setup PHP environment and run install, audit, test, and build commands using Composer'
+branding:
+  icon: 'package'
+  color: 'blue'
+inputs:
+  php-version:
+    description: 'PHP version to use'
+    required: false
+    default: 'latest'
+  php-tools:
+    description: 'PHP tools to install (comma-separated)'
+    required: false
+    default: 'composer'
+  php-extensions:
+    description: 'Additional PHP extensions to install (comma-separated)'
+    required: false
+    default: ''
+  php-coverage:
+    description: 'Enable code coverage'
+    required: false
+    default: 'none'
+  working-directory:
+    description: 'Directory to run the commands in'
+    required: false
+    default: '.'
+  cache-dependency-path:
+    description: 'Path to the dependency file to use for caching'
+    required: false
+    default: 'composer.lock'
+  install-skip:
+    description: 'Skip composer install'
+    required: false
+    default: 'false'
+  install-command:
+    description: 'Command to run composer install'
+    required: false
+    default: 'composer install --no-dev --prefer-dist --no-interaction --no-progress'
+  audit-skip:
+    description: 'Skip composer audit'
+    required: false
+    default: 'false'
+  audit-command:
+    description: 'Command to run composer audit'
+    required: false
+    default: 'composer audit --no-dev --locked --ansi --no-interaction --ignore-platform-reqs --no-progress'
+  test-skip:
+    description: 'Skip tests'
+    required: false
+    default: 'false'
+  test-command:
+    description: 'Command to run tests'
+    required: false
+    default: 'composer run-script test'
+  build-skip:
+    description: 'Skip build'
+    required: false
+    default: 'false'
+  build-command:
+    description: 'Command to run build'
+    required: false
+    default: 'composer run-script build'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Generate extension hash per PHP version and extensions
+      id: extension-hash
+      run: echo "::set-output name=hash::$(echo '${{ inputs.php-version }}-${{ inputs.php-extensions }}' | md5sum | cut -d ' ' -f 1)"
+      shell: bash
+
+    - name: Setup cache environment
+      id: extcache
+      uses: shivammathur/cache-extensions@v1
+      with:
+        php-version: ${{ inputs.php-version }}
+        extensions: ${{ inputs.php-extensions }}
+        key: ${{ runner.os }}-php-${{ steps.extension-hash.outputs.hash }}
+
+    - name: Cache extensions
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.extcache.outputs.dir }}
+        key: ${{ runner.os }}-php-${{ steps.extension-hash.outputs.hash }}
+        restore-keys: ${{ runner.os }}-php-${{ steps.extension-hash.outputs.hash }}
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ inputs.php-version }}
+        extensions: ${{ inputs.php-extensions }}
+        tools: ${{ inputs.php-tools }}
+        coverage: ${{ inputs.php-coverage}}
+
+    - name: Get Composer paths
+      id: composer-paths
+      run: |
+        echo "cache-dir=$(composer config cache-dir)" >> $GITHUB_ENV
+        echo "vendor-dir=$(composer config vendor-dir)" >> $GITHUB_ENV
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Cache Composer dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ env.cache-dir }}
+          ${{ env.vendor-dir }}
+        key: ${{ runner.os }}-composer-${{ inputs.php-version }}-${{ hashFiles(inputs.cache-dependency-path) }}
+        restore-keys: |
+          ${{ runner.os }}-composer-${{ inputs.php-version }}-
+          ${{ runner.os }}-composer-
+
+    - name: Install dependencies
+      if: ${{ inputs.install-skip != 'true' }}
+      run: ${{ inputs.install-command }}
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Run composer audit
+      if: ${{ inputs.audit-skip != 'true' }}
+      run: ${{ inputs.audit-command }}
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Run tests
+      if: ${{ inputs.test-skip != 'true' }}
+      run: ${{ inputs.test-command }}
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Run build
+      if: ${{ inputs.build-skip != 'true' }}
+      run: ${{ inputs.build-command }}
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
