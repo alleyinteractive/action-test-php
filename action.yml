@@ -147,7 +147,7 @@ runs:
       working-directory: ${{ inputs.working-directory }}
 
     - name: Setup WordPress with core test suite
-      if: inputs.wordpress-version != ' false'
+      if: ${{ inputs.wordpress-version != ' false' && inputs.test-skip != 'true' }}
       shell: bash
       env:
         CACHEDIR: /tmp/test-cache # Likely unused
@@ -165,7 +165,7 @@ runs:
         INSTALL_OBJECT_CACHE: ${{ inputs.wordpress-host == 'vip' && 'memcached' || inputs.wordpress-host == 'pantheon' && 'redis' || 'false' }}
       run: |
         bash <(curl -s "https://raw.githubusercontent.com/alleyinteractive/mantle-ci/HEAD/install-wp-tests.sh") wordpress_unit_tests ${{ env.WP_DB_USER }} ${{ env.WP_DB_PASSWORD }} ${{ env.WP_DB_HOST }} ${{ env.WP_VERSION }} ${{ env.WP_TEST_SKIP_DB_CREATE }} ${{ env.WP_INSTALL_VIP_MU_PLUGINS }} ${{ env.INSTALL_OBJECT_CACHE }}
-        rsync -aWq --no-compress --exclude '.npm' --exclude '.git' --exclude ${WP_CORE_DIR} --exclude 'node_modules' . ${PACKAGE_DIRECTORY}
+        # rsync -aWq --no-compress --exclude '.npm' --exclude '.git' --exclude ${WP_CORE_DIR} --exclude 'node_modules' . ${PACKAGE_DIRECTORY}
         # Debug for now
         ls -la ${PACKAGE_DIRECTORY}
 
