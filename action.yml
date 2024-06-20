@@ -43,7 +43,7 @@ inputs:
   audit-command:
     description: 'Command to run composer audit'
     required: false
-    default: 'composer audit --no-dev --locked --ansi --no-interaction --ignore-platform-reqs --no-progress'
+    default: 'composer audit --no-dev --locked --ansi --no-interaction --no-progress'
   test-skip:
     description: 'Skip tests'
     required: false
