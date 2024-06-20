@@ -67,7 +67,14 @@ inputs:
 
 runs:
   using: 'composite'
+
   steps:
+    - name: Start WordPress services
+      if: ${{ inputs.wordpress-version != 'false' }}
+      run: |
+        docker-compose -f ${{ github.action_path }}/docker-compose.yml up -d
+      shell: bash
+
     - name: Generate extension hash per PHP version and extensions
       id: extension-hash
       run: echo "hash=$(echo '${{ inputs.php-version }}-${{ inputs.php-extensions }}' | md5sum | cut -d ' ' -f 1)" >> $GITHUB_OUTPUT
