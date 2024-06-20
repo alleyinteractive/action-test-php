@@ -15,7 +15,15 @@ inputs:
   php-extensions:
     description: 'Additional PHP extensions to install (comma-separated)'
     required: false
-    default: 'mysqli, json, curl, dom, exif, fileinfo, hash, imagick, intl, mbstring, openssl, pcre, xml, zip, opcache, gd'
+    default: >-
+      apcu, bcmath, calendar, ctype, curl, date, dom, exif,
+      filter, ftp, gd, gmagick, gmp, gnupg, hash, iconv,
+      igbinary, intl, json, libxml, mbstring, memcache,
+      memcached, mysqli, mysqlnd, newrelic, openssl, pcntl,
+      pcre, pdo, pdo_mysql, pdo_sqlite, phar, posix, reflection,
+      session, shmop, simplexml, soap, sockets, sodium, spl,
+      sqlite3, ssh2, standard, sysvsem, sysvshm, timezonedb,
+      tokenizer, xml, xmlreader, xmlwriter, zip, zlib
   php-coverage:
     description: 'Enable code coverage'
     required: false
