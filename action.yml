@@ -35,7 +35,7 @@ inputs:
   install-command:
     description: 'Command to run composer install'
     required: false
-    default: 'composer install --no-dev --prefer-dist --no-interaction --no-progress'
+    default: 'composer install --prefer-dist --no-interaction --no-progress'
   audit-skip:
     description: 'Skip composer audit'
     required: false
