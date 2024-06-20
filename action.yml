@@ -19,7 +19,7 @@ inputs:
       apcu, bcmath, calendar, ctype, curl, date, dom, exif,
       filter, ftp, gd, gmp, gnupg, hash, iconv,
       igbinary, intl, json, libxml, mbstring, memcache,
-      memcached, mysqli, mysqlnd, newrelic, openssl, pcntl,
+      memcached, mysqli, mysqlnd, openssl, pcntl,
       pcre, pdo, pdo_mysql, pdo_sqlite, phar, posix, reflection,
       session, shmop, simplexml, soap, sockets, sodium, spl,
       sqlite3, ssh2, standard, sysvsem, sysvshm, timezonedb,
@@ -118,8 +118,8 @@ runs:
     - name: Get Composer paths
       id: composer-paths
       run: |
-        echo "cache-dir=$(composer config cache-dir)" >> $GITHUB_ENV
-        echo "vendor-dir=$(composer config vendor-dir)" >> $GITHUB_ENV
+        echo "cache-dir=$(composer config --absolute cache-dir)" >> $GITHUB_ENV
+        echo "vendor-dir=$(composer config --absolute vendor-dir)" >> $GITHUB_ENV
       shell: bash
       working-directory: ${{ inputs.working-directory }}
 
