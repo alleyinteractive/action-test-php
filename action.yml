@@ -131,8 +131,8 @@ runs:
           ${{ env.vendor-dir }}
         key: ${{ runner.os }}-composer-${{ inputs.php-version }}-${{ hashFiles(inputs.cache-dependency-path) }}
         restore-keys: |
-          ${{ runner.os }}-composer-${{ inputs.php-version }}-
-          ${{ runner.os }}-composer-
+          ${{ runner.os }}-composer-${{ inputs.php-version }}-${{ hashFiles(inputs.cache-dependency-path) }}
+
 
     - name: Install dependencies
       if: ${{ inputs.install-skip != 'true' }}
