@@ -28,6 +28,18 @@ inputs:
     description: 'Enable code coverage'
     required: false
     default: 'none'
+  wordpress-version:
+    description: 'Install WordPress related services for WP version'
+    required: false
+    default: 'latest'
+  wordpress-multisite:
+    description: 'Enable WordPress multisite'
+    required: false
+    default: 'false'
+  wordpress-host:
+    description: 'Shorthand for hosting provider (pantheon, vip, or false)'
+    required: false
+    default: 'vip'
   working-directory:
     description: 'Directory to run the commands in'
     required: false
@@ -133,6 +145,29 @@ runs:
       run: ${{ inputs.audit-command }}
       shell: bash
       working-directory: ${{ inputs.working-directory }}
+
+    - name: Setup WordPress with core test suite
+      if: inputs.wordpress-version != ' false'
+      shell: bash
+      env:
+        CACHEDIR: /tmp/test-cache # Likely unused
+        WP_CORE_DIR: /tmp/wordpress
+        WP_TESTS_DIR: /tmp/wordpress-tests-lib
+        WP_VERSION: ${{ inputs.wordpress-version }}
+        WP_DB_HOST: 127.0.0.1
+        WP_DB_USER: root
+        WP_DB_PASSWORD: '""'
+        WP_MULTISITE: ${{ inputs.wordpress-multisite == true && 1 || 0 }}
+        PACKAGE_DIRECTORY: ${{ format('{0}/wp-content/{1}/', '/tmp/wordpress', inputs.working-directory) }}
+        WP_TEST_SKIP_DB_CREATE: false
+        WP_INSTALL_VIP_MU_PLUGINS: ${{ inputs.wordpress-host == 'vip' && 'true' || 'false' }}
+        # When hosting provider is VIP, object cache is memcached, when it is Pantheon, object cache is redis,
+        INSTALL_OBJECT_CACHE: ${{ inputs.wordpress-host == 'vip' && 'memcached' || inputs.wordpress-host == 'pantheon' && 'redis' || 'false' }}
+      run: |
+        bash <(curl -s "https://raw.githubusercontent.com/alleyinteractive/mantle-ci/HEAD/install-wp-tests.sh") wordpress_unit_tests ${{ env.WP_DB_USER }} ${{ env.WP_DB_PASSWORD }} ${{ env.WP_DB_HOST }} ${{ env.WP_VERSION }} ${{ env.WP_TEST_SKIP_DB_CREATE }} ${{ env.WP_INSTALL_VIP_MU_PLUGINS }} ${{ env.INSTALL_OBJECT_CACHE }}
+        rsync -aWq --no-compress --exclude '.npm' --exclude '.git' --exclude ${WP_CORE_DIR} --exclude 'node_modules' . ${PACKAGE_DIRECTORY}
+        # Debug for now
+        ls -la ${PACKAGE_DIRECTORY}
 
     - name: Run tests
       if: ${{ inputs.test-skip != 'true' }}

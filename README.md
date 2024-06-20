@@ -64,6 +64,24 @@ jobs:
 - Accepts a valid coverage support value (`xdebug`, `pcov`, `none`).
 - Defaults to 'none'.
 
+### `wordpress-version`
+
+- Specify the WordPress version to use, or 'false' to skip WordPress installation and related WordPress services.
+- Accepts a string.
+- Defaults to `'latest'`.
+
+### `wordpress-mulitsite`
+
+- Specify whether to enable WordPress multisite.
+- Accepts a boolean string (`'true'` or `'false'`).
+- Defaults to `'false'`.
+
+### `wordpress-host`
+
+- Specify the host for the WordPress site.
+- Accepts a string. (`'vip'`, `'pantheon'`, or `'false'`)
+- Defaults to `'vip'`.
+
 ### `working-directory`
 
 - Specify the directory to run the commands in.
