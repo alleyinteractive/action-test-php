@@ -56,7 +56,7 @@ jobs:
 
 - Specify additional PHP extensions to install.
 - Accepts a string, comma-separated.
-- Defaults to an empty string.
+- Defaults to `mysqli, json, curl, dom, exif, fileinfo, hash, imagick, intl, mbstring, openssl, pcre, xml, zip, opcache, gd`.
 
 ### `php-coverage`
 

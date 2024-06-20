@@ -15,7 +15,7 @@ inputs:
   php-extensions:
     description: 'Additional PHP extensions to install (comma-separated)'
     required: false
-    default: ''
+    default: 'mysqli, json, curl, dom, exif, fileinfo, hash, imagick, intl, mbstring, openssl, pcre, xml, zip, opcache, gd'
   php-coverage:
     description: 'Enable code coverage'
     required: false
