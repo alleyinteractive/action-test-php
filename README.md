@@ -112,17 +112,11 @@ jobs:
 - Accepts a string.
 - Defaults to `'composer run-script test'`.
 
-### `build-skip`
-
-- Determine whether to skip the build step.
-- Accepts a boolean string (`'true'` or `'false'`).
-- Defaults to `'false'`.
-
 ### `build-command`
 
-- Specify the command to run for build.
+- Specify the command to run for build. Unlike the other steps, the default action is to not run a build command.
 - Accepts a string.
-- Defaults to `'composer run-script build'`.
+- Defaults to `''`.
 
 ## Changelog
 

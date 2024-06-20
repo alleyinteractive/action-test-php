@@ -52,14 +52,10 @@ inputs:
     description: 'Command to run tests'
     required: false
     default: 'composer run-script test'
-  build-skip:
-    description: 'Skip build'
-    required: false
-    default: 'false'
   build-command:
     description: 'Command to run build'
     required: false
-    default: 'composer run-script build'
+    default: ''
 
 runs:
   using: 'composite'
@@ -130,7 +126,7 @@ runs:
       working-directory: ${{ inputs.working-directory }}
 
     - name: Run build
-      if: ${{ inputs.build-skip != 'true' }}
+      if: ${{ inputs.build-command != '' }}
       run: ${{ inputs.build-command }}
       shell: bash
       working-directory: ${{ inputs.working-directory }}
