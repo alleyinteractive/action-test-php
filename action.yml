@@ -204,8 +204,9 @@ runs:
         ls -la
         # If we aren't skipping tests
         if [ "${{ inputs.test-skip }}" != 'true' ]; then
-          # Run the tests
-          eval ${{ inputs.test-command }} || exit 1
+          echo "${{ inputs.test-command }}" > action-test-php-test-command.sh
+          chmod +x action-test-php-test-command.sh
+          bash -e ./action-test-php-test-command.sh
         fi
 
     # Only run the test-command if it wasn't already run in the WordPress setup
