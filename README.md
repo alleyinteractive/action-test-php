@@ -136,6 +136,12 @@ jobs:
 - Accepts a string.
 - Defaults to `''`.
 
+### `github-token`
+
+- Specify the GitHub token to use for Composer authentication (eg. for private repositories).
+- Accepts a string.
+- Defaults to `''`.
+
 ## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed

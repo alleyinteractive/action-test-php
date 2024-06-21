@@ -76,6 +76,10 @@ inputs:
     description: 'Command to run build'
     required: false
     default: ''
+  github-token:
+    description: 'GitHub token for accessing private repositories via composer'
+    required: false
+    default: ''
 
 runs:
   using: 'composite'
@@ -115,6 +119,12 @@ runs:
         echo "cache-dir=$(composer config --absolute cache-dir)" >> $GITHUB_ENV
       shell: bash
       working-directory: ${{ inputs.working-directory }}
+
+    - name: Configure Composer for private repositories
+      if: inputs.github-token != ''
+      run: |
+        composer config -g github-oauth.github.com "${{ inputs.github-token }}"
+      shell: bash
 
     - name: Cache Composer dependencies
       uses: actions/cache@v4
