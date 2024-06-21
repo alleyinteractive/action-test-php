@@ -81,12 +81,6 @@ runs:
   using: 'composite'
 
   steps:
-    - name: Start WordPress services
-      if: ${{ inputs.wordpress-version != 'false' }}
-      run: |
-        docker-compose -f ${{ github.action_path }}/docker-compose.yml up -d
-      shell: bash
-
     - name: Generate extension hash per PHP version and extensions
       id: extension-hash
       run: echo "hash=$(echo '${{ inputs.php-version }}-${{ inputs.php-extensions }}' | md5sum | cut -d ' ' -f 1)" >> $GITHUB_OUTPUT
@@ -123,16 +117,15 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
 
-    - name: Cache Composer dependencies
-      uses: actions/cache@v4
-      with:
-        path: |
-          ${{ env.cache-dir }}
-          ${{ env.vendor-dir }}
-        key: ${{ runner.os }}-composer-${{ inputs.php-version }}-${{ hashFiles(inputs.cache-dependency-path) }}
-        restore-keys: |
-          ${{ runner.os }}-composer-${{ inputs.php-version }}-${{ hashFiles(inputs.cache-dependency-path) }}
-
+    # - name: Cache Composer dependencies
+    #   uses: actions/cache@v4
+    #   with:
+    #     path: |
+    #       ${{ env.cache-dir }}
+    #       ${{ env.vendor-dir }}
+    #     key: ${{ runner.os }}-composer-${{ inputs.php-version }}-${{ hashFiles(inputs.cache-dependency-path) }}
+    #     restore-keys: |
+    #       ${{ runner.os }}-composer-${{ inputs.php-version }}-${{ hashFiles(inputs.cache-dependency-path) }}
 
     - name: Install dependencies
       if: ${{ inputs.install-skip != 'true' }}
@@ -145,6 +138,12 @@ runs:
       run: ${{ inputs.audit-command }}
       shell: bash
       working-directory: ${{ inputs.working-directory }}
+
+    - name: Start WordPress services
+      if: ${{ inputs.wordpress-version != 'false' }}
+      run: |
+        docker-compose -f ${{ github.action_path }}/docker-compose.yml up -d
+      shell: bash
 
     - name: Setup WordPress with core test suite
       if: ${{ inputs.wordpress-version != ' false' && inputs.test-skip != 'true' }}
