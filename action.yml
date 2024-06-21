@@ -113,19 +113,17 @@ runs:
       id: composer-paths
       run: |
         echo "cache-dir=$(composer config --absolute cache-dir)" >> $GITHUB_ENV
-        echo "vendor-dir=$(composer config --absolute vendor-dir)" >> $GITHUB_ENV
       shell: bash
       working-directory: ${{ inputs.working-directory }}
 
-    # - name: Cache Composer dependencies
-    #   uses: actions/cache@v4
-    #   with:
-    #     path: |
-    #       ${{ env.cache-dir }}
-    #       ${{ env.vendor-dir }}
-    #     key: ${{ runner.os }}-composer-${{ inputs.php-version }}-${{ hashFiles(inputs.cache-dependency-path) }}
-    #     restore-keys: |
-    #       ${{ runner.os }}-composer-${{ inputs.php-version }}-${{ hashFiles(inputs.cache-dependency-path) }}
+    - name: Cache Composer dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ env.cache-dir }}
+        key: ${{ runner.os }}-composer-${{ inputs.php-version }}-${{ hashFiles(inputs.cache-dependency-path) }}
+        restore-keys: |
+          ${{ runner.os }}-composer-${{ inputs.php-version }}-${{ hashFiles(inputs.cache-dependency-path) }}
 
     - name: Install dependencies
       if: ${{ inputs.install-skip != 'true' }}
@@ -143,6 +141,16 @@ runs:
       if: ${{ inputs.wordpress-version != 'false' }}
       run: |
         docker-compose -f ${{ github.action_path }}/docker-compose.yml up -d
+        # wait until mysql is responsive
+        timeout=30
+        while ! docker-compose -f ${{ github.action_path }}/docker-compose.yml exec mysql mysqladmin ping -h localhost --silent; do
+          sleep 1
+          timeout=$((timeout - 1))
+          if [ "$timeout" -le 0 ]; then
+            echo "MySQL did not become ready in time"
+            exit 1
+          fi
+        done
       shell: bash
 
     - name: Setup WordPress with core test suite
