@@ -1,6 +1,6 @@
 # Run PHP Tests Action
 
-This GitHub Action sets up a PHP environment and runs install, audit, test, and build commands using Composer for your PHP projects.
+This GitHub Action sets up a PHP environment (optionally with WordPress via [mantle-ci](https://github.com/alleyinteractive/mantle-ci)) and runs install, audit, test, and build commands using Composer for your PHP projects.
 
 ## Usage
 
@@ -56,7 +56,14 @@ jobs:
 
 - Specify additional PHP extensions to install.
 - Accepts a string, comma-separated.
-- Defaults to `mysqli, json, curl, dom, exif, fileinfo, hash, imagick, intl, mbstring, openssl, pcre, xml, zip, opcache, gd`.
+- Defaults to `apcu, bcmath, calendar, ctype, curl, date, dom, exif,
+      filter, ftp, gd, gmp, gnupg, hash, iconv,
+      igbinary, intl, json, libxml, mbstring, memcache,
+      memcached, mysqli, mysqlnd, openssl, pcntl,
+      pcre, pdo, pdo_mysql, pdo_sqlite, phar, posix, reflection,
+      session, shmop, simplexml, soap, sockets, sodium, spl,
+      sqlite3, ssh2, standard, sysvsem, sysvshm, timezonedb,
+      tokenizer, xml, xmlreader, xmlwriter, zip, zlib`.
 
 ### `php-coverage`
 
@@ -66,7 +73,7 @@ jobs:
 
 ### `wordpress-version`
 
-- Specify the WordPress version to use, or 'false' to skip WordPress installation and related WordPress services.
+- Specify the WordPress version to use, or 'false' to skip WordPress installation and related WordPress services. If you specify a version, [test-command](#test-command) will be run from within the context of the WordPress installation.
 - Accepts a string.
 - Defaults to `'latest'`.
 
@@ -146,6 +153,13 @@ jobs:
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed
 recently.
+
+## Related Projects ❤️
+
+- [alleyinteractive/mantle-ci](https://github.com/alleyinteractive/mantle-ci)
+- [shivammathur/setup-php](https://github.com/shivammathur/setup-php)
+- [shivammathur/cache-extensions](https://github.com/shivammathur/cache-extensions)
+
 
 ## Credits
 
