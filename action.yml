@@ -206,7 +206,7 @@ runs:
         if [ "${{ inputs.test-skip }}" != 'true' ]; then
           echo "${{ inputs.test-command }}" > action-test-php-test-command.sh
           chmod +x action-test-php-test-command.sh
-          bash -e ./action-test-php-test-command.sh
+          bash -ex ./action-test-php-test-command.sh
         fi
 
     # Only run the test-command if it wasn't already run in the WordPress setup
