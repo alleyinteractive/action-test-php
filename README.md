@@ -77,7 +77,7 @@ jobs:
 - Accepts a string.
 - Defaults to `'latest'`.
 
-### `wordpress-mulitsite`
+### `wordpress-multisite`
 
 - Specify whether to enable WordPress multisite.
 - Accepts a boolean string (`'true'` or `'false'`).
