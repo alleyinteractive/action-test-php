@@ -154,7 +154,7 @@ runs:
       working-directory: ${{ inputs.working-directory }}
 
     - name: Wait for WordPress services if needed
-      if : ${{ inputs.wordpress-version != 'false' }}
+      if: ${{ inputs.wordpress-version != 'false' && inputs.test-skip != 'true' }}
       run: |
         echo "Waiting for MySQL, Redis, and Memcached to become healthy..."
         timeout=30  # Timeout after 30 seconds
