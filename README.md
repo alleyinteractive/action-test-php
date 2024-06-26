@@ -101,7 +101,7 @@ jobs:
 - Accepts a string.
 - Defaults to `'composer.lock'`.
 
-### `install-skip`
+### `install-skip` or `skip-install`
 
 - Determine whether to skip the composer install step.
 - Accepts a boolean string (`'true'` or `'false'`).
@@ -113,7 +113,7 @@ jobs:
 - Accepts a string.
 - Defaults to `'composer install --no-dev --prefer-dist --no-interaction --no-progress'`.
 
-### `audit-skip`
+### `audit-skip` or `skip-audit`
 
 - Determine whether to skip the composer audit step.
 - Accepts a boolean string (`'true'` or `'false'`).
@@ -125,7 +125,7 @@ jobs:
 - Accepts a string.
 - Defaults to `'composer audit --no-dev --locked --ansi --no-interaction --ignore-platform-reqs --no-progress'`.
 
-### `test-skip`
+### `test-skip` or `skip-test`
 
 - Determine whether to skip the test step.
 - Accepts a boolean string (`'true'` or `'false'`).

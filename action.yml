@@ -52,6 +52,10 @@ inputs:
     description: 'Skip composer install'
     required: false
     default: 'false'
+  skip-install:
+    description: 'Skip composer install'
+    required: false
+    default: 'false'
   install-command:
     description: 'Command to run composer install'
     required: false
@@ -60,11 +64,19 @@ inputs:
     description: 'Skip composer audit'
     required: false
     default: 'false'
+  skip-audit:
+    description: 'Skip composer audit'
+    required: false
+    default: 'false'
   audit-command:
     description: 'Command to run composer audit'
     required: false
     default: 'composer audit --no-dev --locked --ansi --no-interaction'
   test-skip:
+    description: 'Skip tests'
+    required: false
+    default: 'false'
+  skip-test:
     description: 'Skip tests'
     required: false
     default: 'false'
@@ -85,6 +97,13 @@ runs:
   using: 'composite'
 
   steps:
+    - name: Set environment variables
+      run: |
+        echo "SKIP_INSTALL=$([ "${{ inputs.install-skip }}" = "true" ] || [ "${{ inputs.skip-install }}" = "true" ] && echo "true" || echo "false")" >> $GITHUB_ENV
+        echo "SKIP_AUDIT=$([ "${{ inputs.audit-skip }}" = "true" ] || [ "${{ inputs.skip-audit }}" = "true" ] && echo "true" || echo "false")" >> $GITHUB_ENV
+        echo "SKIP_TEST=$([ "${{ inputs.test-skip }}" = "true" ] || [ "${{ inputs.skip-test }}" = "true" ] && echo "true" || echo "false")" >> $GITHUB_ENV
+      shell: bash
+
     - name: Generate extension hash per PHP version and extensions
       id: extension-hash
       run: echo "hash=$(echo '${{ inputs.php-version }}-${{ inputs.php-extensions }}' | md5sum | cut -d ' ' -f 1)" >> $GITHUB_OUTPUT
@@ -142,19 +161,19 @@ runs:
       shell: bash
 
     - name: Install dependencies
-      if: ${{ inputs.install-skip != 'true' }}
+      if: ${{ env.SKIP_INSTALL != 'true' }}
       run: ${{ inputs.install-command }}
       shell: bash
       working-directory: ${{ inputs.working-directory }}
 
     - name: Run composer audit
-      if: ${{ inputs.audit-skip != 'true' }}
+      if: ${{ env.SKIP_AUDIT != 'true' }}
       run: ${{ inputs.audit-command }}
       shell: bash
       working-directory: ${{ inputs.working-directory }}
 
     - name: Wait for WordPress services if needed
-      if: ${{ inputs.wordpress-version != 'false' && inputs.test-skip != 'true' }}
+      if: ${{ inputs.wordpress-version != 'false' && env.SKIP_TEST != 'true' }}
       run: |
         echo "Waiting for MySQL, Redis, and Memcached to become healthy..."
         timeout=30  # Timeout after 30 seconds
@@ -180,7 +199,7 @@ runs:
       shell: bash
 
     - name: Setup WordPress with core test suite
-      if: ${{ inputs.wordpress-version != 'false' && inputs.test-skip != 'true' }}
+      if: ${{ inputs.wordpress-version != 'false' && env.SKIP_TEST != 'true' }}
       shell: bash
       env:
         CACHEDIR: /tmp/test-cache # Likely unused
@@ -203,7 +222,7 @@ runs:
         cd ${PACKAGE_DIRECTORY}
         ls -la
         # If we aren't skipping tests
-        if [ "${{ inputs.test-skip }}" != 'true' ]; then
+        if [ "${{ env.SKIP_TEST }}" != 'true' ]; then
           echo "${{ inputs.test-command }}" > action-test-php-test-command.sh
           chmod +x action-test-php-test-command.sh
           bash -ex ./action-test-php-test-command.sh
@@ -211,7 +230,7 @@ runs:
 
     # Only run the test-command if it wasn't already run in the WordPress setup
     - name: Run tests
-      if: ${{ inputs.test-skip != 'true' && inputs.wordpress-version == 'false' }}
+      if: ${{ env.SKIP_TEST != 'true' && inputs.wordpress-version == 'false' }}
       run: ${{ inputs.test-command }}
       shell: bash
       working-directory: ${{ inputs.working-directory }}
