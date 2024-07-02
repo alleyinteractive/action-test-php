@@ -77,6 +77,12 @@ jobs:
 - Accepts a string.
 - Defaults to `'latest'`.
 
+### `install-wordpress`
+
+- Whether to [install WordPress](https://raw.githubusercontent.com/alleyinteractive/mantle-ci/HEAD/install-wp-tests.sh) as part of the pre-test setup. If you are testing a WordPress plugin or theme in isolation, you should set this to 'false' and [install WordPress in your test setup](https://mantle.alley.com/docs/testing#rsyncing-your-project-to-a-wordpress-installation). This should also be set to 'false' if you are using [Mantle CI to install WordPress](https://mantle.alley.com/docs/testing/installation-manager).
+- Accepts a boolean string (`'true'` or `'false'`).
+- Defaults to `'true'`.
+
 ### `wordpress-multisite`
 
 - Specify whether to enable WordPress multisite.
