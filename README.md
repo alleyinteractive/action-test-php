@@ -71,9 +71,15 @@ jobs:
 - Accepts a valid coverage support value (`xdebug`, `pcov`, `none`).
 - Defaults to 'none'.
 
+### `skip-services` or `services-skip`
+
+- Skip starting Docker-based services (mysql, redis, memcached).
+- Accepts a boolean string (`'true'` or `'false'`).
+- Defaults to `'false'`.
+
 ### `wordpress-version`
 
-- Specify the WordPress version to use, or 'false' to skip WordPress installation and related WordPress services. If you specify a version, [test-command](#test-command) will be run from within the context of the WordPress installation.
+- Specify the WordPress version to use, or 'false' to skip WordPress installation. If you specify a version, [test-command](#test-command) will be run from within the context of the WordPress installation's `wp-content` directory.
 - Accepts a string.
 - Defaults to `'latest'`.
 
