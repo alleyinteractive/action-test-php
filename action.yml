@@ -212,6 +212,7 @@ runs:
         WP_MULTISITE: ${{ inputs.wordpress-multisite == true && 1 || 0 }}
         PACKAGE_DIRECTORY: ${{ format('{0}/wp-content/{1}/', '/tmp/wordpress', inputs.working-directory) }}
         WP_TEST_SKIP_DB_CREATE: false
+        INSTALL_CORE_TEST_SUITE: true
         WP_INSTALL_VIP_MU_PLUGINS: ${{ inputs.wordpress-host == 'vip' && 'true' || 'false' }}
         # When hosting provider is VIP, object cache is memcached, when it is Pantheon, object cache is redis,
         INSTALL_OBJECT_CACHE: ${{ inputs.wordpress-host == 'vip' && 'memcached' || inputs.wordpress-host == 'pantheon' && 'redis' || 'false' }}
