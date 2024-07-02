@@ -106,6 +106,18 @@ runs:
         echo "SKIP_INSTALL=$([ "${{ inputs.install-skip }}" = "true" ] || [ "${{ inputs.skip-install }}" = "true" ] && echo "true" || echo "false")" >> $GITHUB_ENV
         echo "SKIP_AUDIT=$([ "${{ inputs.audit-skip }}" = "true" ] || [ "${{ inputs.skip-audit }}" = "true" ] && echo "true" || echo "false")" >> $GITHUB_ENV
         echo "SKIP_TEST=$([ "${{ inputs.test-skip }}" = "true" ] || [ "${{ inputs.skip-test }}" = "true" ] && echo "true" || echo "false")" >> $GITHUB_ENV
+        echo "CACHEDIR=/tmp/test-cache" >> $GITHUB_ENV
+        echo "WP_CORE_DIR=/tmp/wordpress" >> $GITHUB_ENV
+        echo "WP_TESTS_DIR=/tmp/wordpress-tests-lib" >> $GITHUB_ENV
+        echo "WP_VERSION=${{ inputs.wordpress-version }}" >> $GITHUB_ENV
+        echo "WP_DB_HOST=127.0.0.1" >> $GITHUB_ENV
+        echo "WP_DB_USER=root" >> $GITHUB_ENV
+        echo "WP_DB_PASSWORD=" >> $GITHUB_ENV
+        echo "WP_MULTISITE=${{ inputs.wordpress-multisite == true && 1 || 0 }}" >> $GITHUB_ENV
+        echo "PACKAGE_DIRECTORY=${{ format('{0}/wp-content/{1}/', '/tmp/wordpress', inputs.working-directory) }}" >> $GITHUB_ENV
+        echo "WP_TEST_SKIP_DB_CREATE=false" >> $GITHUB_ENV
+        echo "WP_INSTALL_VIP_MU_PLUGINS=${{ inputs.wordpress-host == 'vip' && 'true' || 'false' }}" >> $GITHUB_ENV
+        echo "INSTALL_OBJECT_CACHE=${{ inputs.wordpress-host == 'vip' && 'memcached' || inputs.wordpress-host == 'pantheon' && 'redis' || 'false' }}" >> $GITHUB_ENV
       shell: bash
 
     - name: Generate extension hash per PHP version and extensions
@@ -205,25 +217,11 @@ runs:
     - name: Setup WordPress with core test suite
       if: ${{ inputs.wordpress-version != 'false' && env.SKIP_TEST != 'true' && inputs.install-wordpress == 'true' }}
       shell: bash
-      env:
-        CACHEDIR: /tmp/test-cache # Likely unused
-        WP_CORE_DIR: /tmp/wordpress
-        WP_TESTS_DIR: /tmp/wordpress-tests-lib
-        WP_VERSION: ${{ inputs.wordpress-version }}
-        WP_DB_HOST: 127.0.0.1
-        WP_DB_USER: root
-        WP_DB_PASSWORD: '""'
-        WP_MULTISITE: ${{ inputs.wordpress-multisite == true && 1 || 0 }}
-        PACKAGE_DIRECTORY: ${{ format('{0}/wp-content/{1}/', '/tmp/wordpress', inputs.working-directory) }}
-        WP_TEST_SKIP_DB_CREATE: false
-        WP_INSTALL_VIP_MU_PLUGINS: ${{ inputs.wordpress-host == 'vip' && 'true' || 'false' }}
-        # When hosting provider is VIP, object cache is memcached, when it is Pantheon, object cache is redis,
-        INSTALL_OBJECT_CACHE: ${{ inputs.wordpress-host == 'vip' && 'memcached' || inputs.wordpress-host == 'pantheon' && 'redis' || 'false' }}
       run: |
         bash <(curl -s "https://raw.githubusercontent.com/alleyinteractive/mantle-ci/HEAD/install-wp-tests.sh") wordpress_unit_tests ${{ env.WP_DB_USER }} ${{ env.WP_DB_PASSWORD }} ${{ env.WP_DB_HOST }} ${{ env.WP_VERSION }} ${{ env.WP_TEST_SKIP_DB_CREATE }} ${{ env.WP_INSTALL_VIP_MU_PLUGINS }} ${{ env.INSTALL_OBJECT_CACHE }}
-        rsync -aWq --no-compress --exclude '.npm' --exclude '.git' --exclude ${WP_CORE_DIR} --exclude 'node_modules' . ${PACKAGE_DIRECTORY}
+        rsync -aWq --no-compress --exclude '.npm' --exclude '.git' --exclude ${{ env.WP_CORE_DIR }} --exclude 'node_modules' . ${{ env.PACKAGE_DIRECTORY }}
         # Debug for now
-        cd ${PACKAGE_DIRECTORY}
+        cd ${{ env.PACKAGE_DIRECTORY }}
         ls -la
         # If we aren't skipping tests
         if [ "${{ env.SKIP_TEST }}" != 'true' ]; then
