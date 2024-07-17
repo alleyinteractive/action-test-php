@@ -245,14 +245,10 @@ runs:
         # Debug for now
         cd ${PACKAGE_DIRECTORY}
         ls -la
+        echo "WP_MULTISITE=${WP_MULTISITE}"
         # If we aren't skipping tests
         if [ "${{ env.SKIP_TEST }}" != 'true' ]; then
-          # Output all environment variables to the top of the test command script
-          echo "#!/bin/bash" > action-test-php-test-command.sh
-          echo "# Environment Variables:" >> action-test-php-test-command.sh
-          env >> action-test-php-test-command.sh
-          echo "" >> action-test-php-test-command.sh  # Add a blank line for readability
-          echo "${{ inputs.test-command }}" >> action-test-php-test-command.sh
+          echo "${{ inputs.test-command }}" > action-test-php-test-command.sh
           chmod +x action-test-php-test-command.sh
           bash -ex ./action-test-php-test-command.sh
           rm -f action-test-php-test-command.sh
@@ -262,12 +258,7 @@ runs:
     - name: Run tests
       if: ${{ env.SKIP_TEST != 'true' && inputs.wordpress-version == 'false' }}
       run: |
-          # Output all environment variables to the top of the test command script
-          echo "#!/bin/bash" > action-test-php-test-command.sh
-          echo "# Environment Variables:" >> action-test-php-test-command.sh
-          env >> action-test-php-test-command.sh
-          echo "" >> action-test-php-test-command.sh  # Add a blank line for readability
-          echo "${{ inputs.test-command }}" >> action-test-php-test-command.sh
+          echo "${{ inputs.test-command }}" > action-test-php-test-command.sh
           chmod +x action-test-php-test-command.sh
           bash -ex ./action-test-php-test-command.sh
           rm -f action-test-php-test-command.sh
