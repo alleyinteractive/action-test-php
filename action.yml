@@ -245,7 +245,6 @@ runs:
         # Debug for now
         cd ${PACKAGE_DIRECTORY}
         ls -la
-        echo "WP_MULTISITE=${WP_MULTISITE}"
         # If we aren't skipping tests
         if [ "${{ env.SKIP_TEST }}" != 'true' ]; then
           echo "${{ inputs.test-command }}" > action-test-php-test-command.sh
