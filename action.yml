@@ -232,7 +232,7 @@ runs:
         WP_DB_HOST: 127.0.0.1
         WP_DB_USER: root
         WP_DB_PASSWORD: '""'
-        WP_MULTISITE: ${{ inputs.wordpress-multisite == true && 1 || 0 }}
+        WP_MULTISITE: ${{ (inputs.wordpress-multisite == 'true') && '1' || '0' }}
         PACKAGE_DIRECTORY: ${{ format('{0}/wp-content/{1}/', '/tmp/wordpress', inputs.working-directory) }}
         WP_TEST_SKIP_DB_CREATE: false
         WP_INSTALL_CORE_TEST_SUITE: true
