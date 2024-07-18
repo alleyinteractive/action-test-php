@@ -25,7 +25,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Run PHP Tests in src directory
-      uses: alleyinteractive/action-test-php@v1.0.0-alpha
+      uses: alleyinteractive/action-test-php@develop
       with:
         php-version: '8.0'
         working-directory: './src'
@@ -79,7 +79,7 @@ jobs:
 
 ### `wordpress-version`
 
-- Specify the WordPress version to use, or 'false' to skip WordPress installation. If you specify a version, [test-command](#test-command) will be run from within the context of the WordPress installation's `wp-content` directory. If you are using [Mantle Testkit](https://mantle.alley.com/docs/testing/testkit), you can safely set this to `false`.
+- Specify the WordPress version to use, or 'false' to skip WordPress installation. If you specify a version, [test-command](#test-command) will be run from within the context of the WordPress installation's `wp-content` directory. If you are using [Mantle Testkit](https://mantle.alley.com/docs/testing/testkit) or are not using WordPress based tests, you should set this to `false`.
 - Accepts a string.
 - Defaults to `'latest'`.
 
