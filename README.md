@@ -50,7 +50,7 @@ Alley's
 project that uses [Mantle Testkit](https://mantle.alley.com/docs/testing/testkit) as a
 testing framework is a common example of a plugin that can use this action and
 roll its own WordPress installation. Mantle Testkit
-[supports installing WordPress and rsyncing your project](https://mantle.alley.com/docs/testing/installation-manager)
+[supports installing WordPress and rsync-ing your project](https://mantle.alley.com/docs/testing/installation-manager)
  to wherever you need it to be (`wp-content`, `wp-content/plugins`, etc).
 
 ```yaml
