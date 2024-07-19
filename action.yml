@@ -256,6 +256,11 @@ runs:
     # Only run the test-command if it wasn't already run in the WordPress setup
     - name: Run tests
       if: ${{ env.SKIP_TEST != 'true' && inputs.wordpress-version == 'false' }}
+      env:
+        WP_DB_HOST: 127.0.0.1
+        WP_DB_USER: root
+        WP_DB_PASSWORD: '""'
+        WP_MULTISITE: ${{ (inputs.wordpress-multisite == 'true') && '1' || '0' }}
       run: |
           echo "${{ inputs.test-command }}" > action-test-php-test-command.sh
           chmod +x action-test-php-test-command.sh
