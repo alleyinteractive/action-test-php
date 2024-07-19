@@ -116,7 +116,7 @@ jobs:
 
 ### `skip-services` or `services-skip`
 
-- Skip starting Docker-based services (mysql, redis, memcached). If you are using [Mantle Testkit](https://mantle.alley.com/docs/testing/testkit), you can safely set this to `false` if you are using SQLite, or leave it as `true` if you are using MySQL.
+- Skip starting Docker-based services (mysql, redis, memcached). If you are using [Mantle Testkit](https://mantle.alley.com/docs/testing/testkit), you can safely set this to `'true'` if you are using SQLite, or leave it as `'false'` if you are using MySQL.
 - Accepts a boolean string (`'true'` or `'false'`).
 - Defaults to `'false'`.
 
