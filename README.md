@@ -36,6 +36,49 @@ jobs:
 
 ```
 
+Out of the box, `action-test-php` will attempt to install WordPress via the
+[mantle-ci](https://github.com/alleyinteractive/mantle-ci/blob/HEAD/install-wp-tests.sh)
+script and `rsync` your cloned out repository to the WordPress `wp-content`
+directory. If you are not a `wp-content`-based project, you should set
+`skip-wordpress-install` to `'true'` and ensure your test command properly sets
+up the environment (install WordPress, rsync the repository, etc).
+
+### Example Usage as a Plugin/Theme
+
+Alley's
+[create-wordpress-plugin](https://github.com/alleyinteractive/create-wordpress-plugin)
+project that uses [Mantle Testkit](https://mantle.alley.com/docs/testing/testkit) as a
+testing framework is a common example of a plugin that can use this action and
+roll its own WordPress installation. Mantle Testkit
+[supports installing WordPress and rsyncing your project](https://mantle.alley.com/docs/testing/installation-manager)
+ to wherever you need it to be (`wp-content`, `wp-content/plugins`, etc).
+
+```yaml
+name: PHP CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  php-tests:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Run PHP Tests in src directory
+      uses: alleyinteractive/action-test-php@develop
+      with:
+        # After installation, the action will run the test command which defaults to `composer test`.
+        skip-wordpress-install: 'true'
+
+```
+
 ## Inputs
 
 > Specify using `with` keyword.
@@ -134,6 +177,23 @@ jobs:
 ### `test-skip` or `skip-test`
 
 - Determine whether to skip the test step.
+- Accepts a boolean string (`'true'` or `'false'`).
+- Defaults to `'false'`.
+
+### `skip-wordpress-install`
+
+- Skip the installation of WordPress and the rsync-ing of the repository to
+  `/tmp/wordpress/wp-content`.
+
+  If you are not a `wp-content`-based project, you should set this to `'true'`.
+  Your test command will need to properly set up the environment (install
+  WordPress, rsync the repository, etc).
+- Accepts a boolean string (`'true'` or `'false'`).
+- Defaults to `'false'`.
+
+### `skip-core-test-suite`
+
+- Skip the installation of the WordPress core test suite when installing WordPress. If `skip-wordpress-install` is set to `'true'`, this option will be ignored.
 - Accepts a boolean string (`'true'` or `'false'`).
 - Defaults to `'false'`.
 
