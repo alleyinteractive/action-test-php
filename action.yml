@@ -80,6 +80,14 @@ inputs:
     description: 'Skip tests'
     required: false
     default: 'false'
+  skip-core-test-suite:
+    description: 'Skip the installation of the WordPress core test suite. Useful if you are not using the WordPress core testing framework (Mantle Testkit).'
+    required: false
+    default: 'false'
+  skip-wordpress-install:
+    description: 'Skip installing WordPress'
+    required: false
+    default: 'false'
   test-command:
     description: 'Command to run tests'
     required: false
@@ -221,11 +229,11 @@ runs:
         fi
       shell: bash
 
-    - name: Setup WordPress with core test suite
-      if: ${{ inputs.wordpress-version != 'false' && env.SKIP_TEST != 'true' }}
+    - name: Setup WordPress with core test suite for a wp-content project and run tests
+      if: ${{ inputs.skip-wordpress-install != 'false' && inputs.wordpress-version != 'false' && env.SKIP_TEST != 'true' }}
       shell: bash
       env:
-        CACHEDIR: /tmp/test-cache # Likely unused
+        CACHEDIR: /tmp/test-cache
         WP_CORE_DIR: /tmp/wordpress
         WP_TESTS_DIR: /tmp/wordpress-tests-lib
         WP_VERSION: ${{ inputs.wordpress-version }}
@@ -235,7 +243,7 @@ runs:
         WP_MULTISITE: ${{ (inputs.wordpress-multisite == 'true') && '1' || '0' }}
         PACKAGE_DIRECTORY: ${{ format('{0}/wp-content/{1}/', '/tmp/wordpress', inputs.working-directory) }}
         WP_TEST_SKIP_DB_CREATE: false
-        WP_INSTALL_CORE_TEST_SUITE: true
+        WP_INSTALL_CORE_TEST_SUITE: ${{ inputs.skip-core-test-suite == false' && '0' || '1' }}
         WP_INSTALL_VIP_MU_PLUGINS: ${{ inputs.wordpress-host == 'vip' && 'true' || 'false' }}
         # When hosting provider is VIP, object cache is memcached, when it is Pantheon, object cache is redis,
         INSTALL_OBJECT_CACHE: ${{ inputs.wordpress-host == 'vip' && 'memcached' || inputs.wordpress-host == 'pantheon' && 'redis' || 'false' }}
@@ -254,13 +262,17 @@ runs:
         fi
 
     # Only run the test-command if it wasn't already run in the WordPress setup
+    # This action is used for projects that skip the WordPress installation and will roll their own such as
+    # a project that doesn't use WordPress or uses Mantle Testkit to install WordPress and manage rsyncing.
     - name: Run tests
-      if: ${{ env.SKIP_TEST != 'true' && inputs.wordpress-version == 'false' }}
+      if: ${{ inputs.skip-wordpress-install == 'true' && env.SKIP_TEST != 'true' && inputs.wordpress-version == 'false' }}
       env:
+        WP_CORE_DIR: /tmp/wordpress
         WP_DB_HOST: 127.0.0.1
-        WP_DB_USER: root
         WP_DB_PASSWORD: '""'
+        WP_DB_USER: root
         WP_MULTISITE: ${{ (inputs.wordpress-multisite == 'true') && '1' || '0' }}
+        WP_VERSION: ${{ inputs.wordpress-version }}
       run: |
           echo "${{ inputs.test-command }}" > action-test-php-test-command.sh
           chmod +x action-test-php-test-command.sh
