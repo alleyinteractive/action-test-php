@@ -265,7 +265,7 @@ runs:
     # This action is used for projects that skip the WordPress installation and will roll their own such as
     # a project that doesn't use WordPress or uses Mantle Testkit to install WordPress and manage rsyncing.
     - name: Run tests
-      if: ${{ env.SKIP_TEST != 'true' && inputs.wordpress-version == 'false' }}
+      if: ${{ env.SKIP_TEST != 'true' && (inputs.skip-wordpress-install == 'true' || inputs.wordpress-version == 'false') }}
       env:
         WP_CORE_DIR: /tmp/wordpress
         WP_DB_HOST: 127.0.0.1
