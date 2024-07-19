@@ -125,8 +125,8 @@ runs:
       run: |
         # Test for incompatible / unsupported options:
 
-        # If SKIP_SERVICES is true and wordpress-version is not false, fail
-        if [ "${{ env.SKIP_SERVICES }}" = "true" ] && [ "${{ inputs.wordpress-version }}" != "false" ]; then
+        # If SKIP_SERVICES is true, skip-wordpress-install is not true, and wordpress-version is not false, fail
+        if [ "${{ env.SKIP_SERVICES }}" = "true" ] && [ "${{ inputs.skip-wordpress-install }}" != "true" ] && [ "${{ inputs.wordpress-version }}" != "false" ]; then
           unsupported_configuration=true
           echo "wordpress-version != false requires SKIP_SERVICES to be false" >&2
           exit 1
