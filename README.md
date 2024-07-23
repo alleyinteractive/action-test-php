@@ -27,7 +27,7 @@ jobs:
     - name: Run PHP Tests in src directory
       uses: alleyinteractive/action-test-php@develop
       with:
-        php-version: '8.0'
+        php-version: '8.1'
         working-directory: './src'
         cache-dependency-path: './src/composer.lock'
         audit-skip: 'true'
