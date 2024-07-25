@@ -160,7 +160,7 @@ jobs:
 
 - Specify the command to run for composer install.
 - Accepts a string.
-- Defaults to `'composer install --no-dev --prefer-dist --no-interaction --no-progress'`.
+- Defaults to `'composer install --prefer-dist --no-interaction --no-progress'`.
 
 ### `audit-skip` or `skip-audit`
 
