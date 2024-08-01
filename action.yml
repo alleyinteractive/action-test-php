@@ -188,7 +188,7 @@ runs:
     - name: Start services in the background
       if: ${{ env.SKIP_SERVICES != 'true' }}
       run: |
-        docker-compose -f ${{ github.action_path }}/docker-compose.yml up -d
+        docker compose -f ${{ github.action_path }}/docker-compose.yml up -d
       shell: bash
 
     - name: Install dependencies
