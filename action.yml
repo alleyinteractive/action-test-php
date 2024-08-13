@@ -209,9 +209,9 @@ runs:
         echo "Waiting for MySQL, Redis, and Memcached to become healthy..."
         timeout=30  # Timeout after 30 seconds
         while [ $timeout -gt 0 ]; do
-          mysql_health="$(docker compose -f ${{ github.action_path }}/docker-compose.yml ps -q mysql | xargs docker inspect -f '{{ .State.Health.Status }}')"
-          redis_health="$(docker compose -f ${{ github.action_path }}/docker-compose.yml ps -q redis | xargs docker inspect -f '{{ .State.Health.Status }}')"
-          memcached_health="$(docker compose -f ${{ github.action_path }}/docker-compose.yml ps -q memcached | xargs docker inspect -f '{{ .State.Health.Status }}')"
+          mysql_health="$(docker compose --env-file /dev/null -f ${{ github.action_path }}/docker-compose.yml ps -q mysql | xargs docker inspect -f '{{ .State.Health.Status }}')"
+          redis_health="$(docker compose --env-file /dev/null -f ${{ github.action_path }}/docker-compose.yml ps -q redis | xargs docker inspect -f '{{ .State.Health.Status }}')"
+          memcached_health="$(docker compose --env-file /dev/null -f ${{ github.action_path }}/docker-compose.yml ps -q memcached | xargs docker inspect -f '{{ .State.Health.Status }}')"
 
           if [ "$mysql_health" = "healthy" ] && [ "$redis_health" = "healthy" ] && [ "$memcached_health" = "healthy" ]; then
             echo "All services are healthy."
