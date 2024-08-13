@@ -43,42 +43,6 @@ directory. If you are not a `wp-content`-based project, you should set
 `skip-wordpress-install` to `'true'` and ensure your test command properly sets
 up the environment (install WordPress, rsync the repository, etc).
 
-### Example Usage as a Plugin/Theme
-
-Alley's
-[create-wordpress-plugin](https://github.com/alleyinteractive/create-wordpress-plugin)
-project that uses [Mantle Testkit](https://mantle.alley.com/docs/testing/testkit) as a
-testing framework is a common example of a plugin that can use this action and
-roll its own WordPress installation. Mantle Testkit
-[supports installing WordPress and rsync-ing your project](https://mantle.alley.com/docs/testing/installation-manager)
- to wherever you need it to be (`wp-content`, `wp-content/plugins`, etc).
-
-```yaml
-name: PHP CI
-
-on:
-  pull_request:
-    branches:
-      - main
-    types: [opened, synchronize, reopened, ready_for_review]
-
-jobs:
-  php-tests:
-    if: github.event.pull_request.draft == false
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Run PHP Tests in src directory
-      uses: alleyinteractive/action-test-php@develop
-      with:
-        # After installation, the action will run the test command which defaults to `composer test`.
-        skip-wordpress-install: 'true'
-
-```
-
 ## Inputs
 
 > Specify using `with` keyword.
@@ -214,6 +178,132 @@ jobs:
 - Specify the GitHub token to use for Composer authentication (eg. for private repositories).
 - Accepts a string.
 - Defaults to `''`.
+
+## Examples
+
+### Usage on a Plugin/Theme
+
+Alley's
+[create-wordpress-plugin](https://github.com/alleyinteractive/create-wordpress-plugin)
+project that uses [Mantle Testkit](https://mantle.alley.com/docs/testing/testkit) as a
+testing framework is a common example of a plugin that can use this action and
+roll its own WordPress installation. Mantle Testkit
+[supports installing WordPress and rsync-ing your project](https://mantle.alley.com/docs/testing/installation-manager)
+ to wherever you need it to be (`wp-content`, `wp-content/plugins`, etc).
+
+```yaml
+name: PHP CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  php-tests:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Run PHP Tests in src directory
+      uses: alleyinteractive/action-test-php@develop
+      with:
+        # After installation, the action will run the test command which defaults to `composer test`.
+        skip-wordpress-install: 'true'
+
+```
+
+### Using a Rolling WordPress Version
+
+You can test against a rolling number of WordPress versions by setting up the
+action with a matrix strategy. For example, to test against the last 3 versions
+of WordPress and roll it up to a single job that can be used for branch
+protection:
+
+```yaml
+name: "All Pull Request Tests"
+
+on:
+  pull_request:
+    branches:
+      - develop
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  # Get the last 3 major versions of WordPress for use in the job matrix.
+  find-wordpress-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{ steps.get-versions.outputs.versions }}
+    steps:
+      - name: Get WordPress Versions
+        id: get-versions
+        run: echo "versions=$(curl -s https://api.wordpress.org/core/version-check/1.7/ | jq -r '.offers[] | select(.response == "autoupdate").version' | head -n 3 | sort -u | sed 's/\.[^.]*$//' | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+
+  # We use a single job to ensure that all steps run in the same environment and
+  # reduce the number of minutes used.
+  run-pr-tests:
+    needs: find-wordpress-versions
+    # Don't run on draft PRs
+    if: github.event.pull_request.draft == false
+    # Timeout after 10 minutes
+    timeout-minutes: 10
+    # Define a matrix of PHP/WordPress versions to test against
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [8.1, 8.2, 8.3]
+        wordpress: ${{fromJson(needs.find-wordpress-versions.outputs.versions)}}
+    runs-on: ubuntu-latest
+    # Cancel any existing runs of this workflow
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}-P${{ matrix.php }}-WP${{ matrix.wordpress }}
+      cancel-in-progress: true
+    # Name the job in the matrix
+    name: "PR Tests PHP ${{ matrix.php }} WordPress ${{ matrix.wordpress }}"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run General Tests
+        # See https://github.com/alleyinteractive/action-test-general for more options
+        uses: alleyinteractive/action-test-general@develop
+
+      - name: Run Node Tests
+        # See https://github.com/alleyinteractive/action-test-node for more options.
+        # Defaults to the latest LTS version.
+        uses: alleyinteractive/action-test-node@develop
+
+      - name: Run PHP Tests
+        # See https://github.com/alleyinteractive/action-test-php for more options
+        uses: alleyinteractive/action-test-php@develop
+        with:
+          php-version: '${{ matrix.php }}'
+          wordpress-version: '${{ matrix.wordpress }}'
+          skip-wordpress-install: 'true'
+
+  # Check if any of the pr-tests failed and fail the job if so.
+  pr-tests:
+    needs: run-pr-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check job results
+        run: |
+          echo "Checking matrix job results..."
+          if [ "${{ needs.run-pr-tests.result }}" == "failure" ]; then
+            echo "One or more matrix jobs failed."
+            exit 1
+          else
+            echo "All matrix jobs passed."
+          fi
+```
+
+Once added, you can use `pr-tests` as a required check for branch protection
+without having to worry about updating it when a new version of WordPress is
+released.
 
 ## Changelog
 
