@@ -1,6 +1,6 @@
 services:
   mysql:
-    image: mysql:8
+    image: mysql:lts
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     ports:
