@@ -182,14 +182,12 @@ runs:
         composer config -g github-oauth.github.com "${{ inputs.github-token }}"
       shell: bash
 
-    - name: Cache Composer dependencies
-      uses: actions/cache@v4
+    - name: Restore Composer cache
+      id: composer-cache
+      uses: actions/cache/restore@v4
       with:
-        path: |
-          ${{ env.COMPOSER_CACHE_DIR }}
+        path: ${{ env.COMPOSER_CACHE_DIR }}
         key: ${{ runner.os }}-composer-${{ inputs.php-version }}-${{ hashFiles(inputs.cache-dependency-path) }}
-        restore-keys: |
-          ${{ runner.os }}-composer-${{ inputs.php-version }}-${{ hashFiles(inputs.cache-dependency-path) }}
 
     - name: Install dependencies
       if: ${{ env.SKIP_INSTALL != 'true' }}
@@ -202,6 +200,12 @@ runs:
       run: ${{ inputs.audit-command }}
       shell: bash
       working-directory: ${{ inputs.working-directory }}
+
+    - name: Save Composer cache
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ env.COMPOSER_CACHE_DIR }}
+        key: ${{ steps.composer-cache.outputs.cache-primary-key }}
 
     - name: Wait for services if needed
       if: ${{ env.SKIP_SERVICES != 'true' }}
