@@ -249,25 +249,15 @@ runs:
         INSTALL_OBJECT_CACHE: ${{ inputs.wordpress-host == 'vip' && 'memcached' || inputs.wordpress-host == 'pantheon' && 'redis' || 'false' }}
       run: |
         bash <(curl -s "https://raw.githubusercontent.com/alleyinteractive/mantle-ci/HEAD/install-wp-tests.sh") wordpress_unit_tests ${{ env.WP_DB_USER }} ${{ env.WP_DB_PASSWORD }} ${{ env.WP_DB_HOST }} ${{ env.WP_VERSION }} ${{ env.WP_TEST_SKIP_DB_CREATE }} ${{ env.WP_INSTALL_VIP_MU_PLUGINS }} ${{ env.INSTALL_OBJECT_CACHE }}
-        set -x
+
         # If WP_INSTALL_VIP_MU_PLUGINS is true, we need to exclude mu-plugins from the rsync
         EXCLUDE_MU_PLUGINS=""
         if [ "${{ env.WP_INSTALL_VIP_MU_PLUGINS }}" = "true" ]; then
           echo "Excluding mu-plugins from rsync"
           EXCLUDE_MU_PLUGINS="--exclude mu-plugins"
         fi
-        echo "Package directory contents:"
-        ls -la ${PACKAGE_DIRECTORY}
-        echo "Package directory mu-plugins contents:"
-        ls -la ${PACKAGE_DIRECTORY}/mu-plugins/
-        echo "Rsync"
-        rsync -aWq --no-compress --delete --exclude '.npm' --exclude '.git' --exclude ${WP_CORE_DIR} --exclude 'node_modules' ${EXCLUDE_MU_PLUGINS} . ${PACKAGE_DIRECTORY}
 
-        # Debug for now
-        cd ${PACKAGE_DIRECTORY}
-        ls -la
-        echo "Post rsync mu-plugins contents:"
-        ls -la ${PACKAGE_DIRECTORY}/mu-plugins/
+        rsync -aWq --no-compress --delete --exclude '.npm' --exclude '.git' --exclude ${WP_CORE_DIR} --exclude 'node_modules' ${EXCLUDE_MU_PLUGINS} . ${PACKAGE_DIRECTORY}
 
         # If we aren't skipping tests
         if [ "${{ env.SKIP_TEST }}" != 'true' ]; then
