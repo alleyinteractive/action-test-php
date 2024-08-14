@@ -6,11 +6,11 @@ services:
     ports:
       - "3306:3306"
     healthcheck:
-      test: ["CMD", "mysql", "--user=root", "--execute=SELECT 1"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "--silent"]
       interval: 2s
       timeout: 3s
-      retries: 10
-      start_period: 10s
+      retries: 5
+      start_period: 5s
 
   redis:
     image: redis:7
