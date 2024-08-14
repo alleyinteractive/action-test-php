@@ -254,13 +254,21 @@ runs:
         EXCLUDE_MU_PLUGINS=""
         if [ "${{ env.WP_INSTALL_VIP_MU_PLUGINS }}" = "true" ]; then
           echo "Excluding mu-plugins from rsync"
-          EXCLUDE_MU_PLUGINS="--exclude 'mu-plugins'"
+          EXCLUDE_MU_PLUGINS="--exclude mu-plugins"
         fi
+        echo "Package directory contents:"
+        ls -la ${PACKAGE_DIRECTORY}
+        echo "Package directory mu-plugins contents:"
+        ls -la ${PACKAGE_DIRECTORY}/mu-plugins/
+        echo "Rsync"
         rsync -aWq --no-compress --delete --exclude '.npm' --exclude '.git' --exclude ${WP_CORE_DIR} --exclude 'node_modules' ${EXCLUDE_MU_PLUGINS} . ${PACKAGE_DIRECTORY}
 
         # Debug for now
         cd ${PACKAGE_DIRECTORY}
         ls -la
+        echo "Post rsync mu-plugins contents:"
+        ls -la ${PACKAGE_DIRECTORY}/mu-plugins/
+
         # If we aren't skipping tests
         if [ "${{ env.SKIP_TEST }}" != 'true' ]; then
           echo "${{ inputs.test-command }}" > action-test-php-test-command.sh
