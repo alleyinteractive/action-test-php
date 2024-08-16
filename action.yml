@@ -263,6 +263,9 @@ runs:
 
         rsync -aWq --no-compress --delete --exclude '.npm' --exclude '.git' --exclude ${WP_CORE_DIR} --exclude 'node_modules' ${EXCLUDE_MU_PLUGINS} . ${PACKAGE_DIRECTORY}
 
+        # Change to the package directory
+        cd ${PACKAGE_DIRECTORY}
+
         # If we aren't skipping tests
         if [ "${{ env.SKIP_TEST }}" != 'true' ]; then
           echo "${{ inputs.test-command }}" > action-test-php-test-command.sh
