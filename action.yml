@@ -133,12 +133,6 @@ runs:
         fi
       shell: bash
 
-    - name: Start services in the background
-      if: ${{ env.SKIP_SERVICES != 'true' }}
-      run: |
-        docker compose --env-file /dev/null -f ${{ github.action_path }}/docker-compose.yml up -d
-      shell: bash
-
     - name: Generate extension hash per PHP version and extensions
       id: extension-hash
       run: echo "hash=$(echo '${{ inputs.php-version }}-${{ inputs.php-extensions }}' | md5sum | cut -d ' ' -f 1)" >> $GITHUB_OUTPUT
@@ -188,6 +182,12 @@ runs:
       with:
         path: ${{ env.COMPOSER_CACHE_DIR }}
         key: ${{ runner.os }}-composer-${{ inputs.php-version }}-${{ hashFiles(inputs.cache-dependency-path) }}
+
+    - name: Start services in the background
+      if: ${{ env.SKIP_SERVICES != 'true' }}
+      run: |
+        docker compose --env-file /dev/null -f ${{ github.action_path }}/docker-compose.yml up -d
+      shell: bash
 
     - name: Install dependencies
       if: ${{ env.SKIP_INSTALL != 'true' }}
