@@ -141,7 +141,7 @@ runs:
     - name: Start services in the background
       if: ${{ env.SKIP_SERVICES != 'true' }}
       run: |
-        docker compose --env-file /dev/null -f ${{ github.action_path }}/docker-compose.yml up -d --quiet-pull
+        docker compose --env-file /dev/null -f ${{ github.action_path }}/docker-compose.yml up --detach --quiet-pull
       shell: bash
 
     - name: Setup cache environment
