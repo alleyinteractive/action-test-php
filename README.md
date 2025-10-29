@@ -234,20 +234,21 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
-  # Get the last 3 major versions of WordPress for use in the job matrix.
-  find-wordpress-versions:
+  get-versions:
     runs-on: ubuntu-latest
     outputs:
-      versions: ${{ steps.get-versions.outputs.versions }}
+      versions: ${{ steps.wp-versions.outputs.versions }}
     steps:
       - name: Get WordPress Versions
-        id: get-versions
-        run: echo "versions=$(curl -s https://api.wordpress.org/core/version-check/1.7/ | jq -r '.offers[] | select(.response == "autoupdate").version' | head -n 3 | sort -u | sed 's/\.[^.]*$//' | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+        id: wp-versions
+        uses: alleyinteractive/action-get-wordpress-versions@develop
+        with:
+          number: 3
 
   # We use a single job to ensure that all steps run in the same environment and
   # reduce the number of minutes used.
   run-pr-tests:
-    needs: find-wordpress-versions
+    needs: get-versions
     # Don't run on draft PRs
     if: github.event.pull_request.draft == false
     # Timeout after 10 minutes
@@ -257,7 +258,7 @@ jobs:
       fail-fast: false
       matrix:
         php: [8.1, 8.2, 8.3]
-        wordpress: ${{fromJson(needs.find-wordpress-versions.outputs.versions)}}
+        wordpress: ${{fromJson(needs.get-versions.outputs.versions)}}
     runs-on: ubuntu-latest
     # Cancel any existing runs of this workflow
     concurrency:
