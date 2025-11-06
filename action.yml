@@ -72,6 +72,10 @@ inputs:
     description: 'Command to run composer audit'
     required: false
     default: 'composer audit --no-dev --locked --ansi --no-interaction'
+  mantle-ci-branch:
+    description: 'Branch of Mantle CI scripts to use'
+    required: false
+    default: 'HEAD'
   test-skip:
     description: 'Skip tests'
     required: false
@@ -252,7 +256,7 @@ runs:
         # When hosting provider is VIP, object cache is memcached, when it is Pantheon, object cache is redis,
         INSTALL_OBJECT_CACHE: ${{ inputs.wordpress-host == 'vip' && 'memcached' || inputs.wordpress-host == 'pantheon' && 'redis' || 'false' }}
       run: |
-        bash <(curl -s "https://raw.githubusercontent.com/alleyinteractive/mantle-ci/HEAD/install-wp-tests.sh") wordpress_unit_tests ${{ env.WP_DB_USER }} ${{ env.WP_DB_PASSWORD }} ${{ env.WP_DB_HOST }} ${{ env.WP_VERSION }} ${{ env.WP_TEST_SKIP_DB_CREATE }} ${{ env.WP_INSTALL_VIP_MU_PLUGINS }} ${{ env.INSTALL_OBJECT_CACHE }}
+        bash <(curl -s "https://raw.githubusercontent.com/alleyinteractive/mantle-ci/${{ inputs.mantle-ci-branch }}/install-wp-tests.sh") wordpress_unit_tests ${{ env.WP_DB_USER }} ${{ env.WP_DB_PASSWORD }} ${{ env.WP_DB_HOST }} ${{ env.WP_VERSION }} ${{ env.WP_TEST_SKIP_DB_CREATE }} ${{ env.WP_INSTALL_VIP_MU_PLUGINS }} ${{ env.INSTALL_OBJECT_CACHE }}
 
         # If WP_INSTALL_VIP_MU_PLUGINS is true, we need to exclude mu-plugins from the rsync
         EXCLUDE_MU_PLUGINS=""
