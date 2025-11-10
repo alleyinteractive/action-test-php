@@ -138,6 +138,12 @@ up the environment (install WordPress, rsync the repository, etc).
 - Accepts a string.
 - Defaults to `'composer audit --no-dev --locked --ansi --no-interaction --ignore-platform-reqs --no-progress'`.
 
+### `mantle-ci-branch`
+
+- Specify the branch of Mantle CI scripts to use for WordPress installation.
+- Accepts a string.
+- Defaults to `'HEAD'`.
+
 ### `test-skip` or `skip-test`
 
 - Determine whether to skip the test step.
