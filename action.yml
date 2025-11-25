@@ -161,7 +161,8 @@ runs:
       with:
         path: ${{ steps.extcache.outputs.dir }}
         key: ${{ runner.os }}-php-${{ steps.extension-hash.outputs.hash }}
-        restore-keys: ${{ runner.os }}-php-${{ steps.extension-hash.outputs.hash }}
+        restore-keys: |
+          ${{ runner.os }}-php-
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
@@ -175,7 +176,7 @@ runs:
       id: composer-paths
       run: |
         COMPOSER_CACHE_DIR=$(composer config --absolute cache-dir)
-        echo "COMPOSER_CACHE_DIR=${COMPOSER_CACHE_DIR}" >> $GITHUB_ENV
+        echo "dir=${COMPOSER_CACHE_DIR}" >> $GITHUB_OUTPUT
         mkdir -p ${COMPOSER_CACHE_DIR}
       shell: bash
       working-directory: ${{ inputs.working-directory }}
@@ -186,12 +187,16 @@ runs:
         composer config -g github-oauth.github.com "${{ inputs.github-token }}"
       shell: bash
 
-    - name: Restore Composer cache
-      id: composer-cache
-      uses: actions/cache/restore@v4
+    - name: Cache Composer
+      uses: actions/cache@v4
       with:
-        path: ${{ env.COMPOSER_CACHE_DIR }}
-        key: ${{ runner.os }}-composer-${{ inputs.php-version }}-${{ hashFiles(inputs.cache-dependency-path) }}
+        path: |
+          ${{ steps.composer-paths.outputs.dir }}
+        key: ${{ runner.os }}-composer-${{ inputs.php-version }}-${{ hashFiles(format('{0}/{1}', inputs.working-directory, inputs.cache-dependency-path)) }}
+        restore-keys: |
+          ${{ runner.os }}-composer-${{ inputs.php-version }}-
+          ${{ runner.os }}-composer-
+          ${{ runner.os }}-
 
     - name: Install dependencies
       if: ${{ env.SKIP_INSTALL != 'true' }}
@@ -204,12 +209,6 @@ runs:
       run: ${{ inputs.audit-command }}
       shell: bash
       working-directory: ${{ inputs.working-directory }}
-
-    - name: Save Composer cache
-      uses: actions/cache/save@v4
-      with:
-        path: ${{ env.COMPOSER_CACHE_DIR }}
-        key: ${{ steps.composer-cache.outputs.cache-primary-key }}
 
     - name: Wait for services if needed
       if: ${{ env.SKIP_SERVICES != 'true' }}
