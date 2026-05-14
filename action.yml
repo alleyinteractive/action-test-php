@@ -157,7 +157,7 @@ runs:
         key: ${{ runner.os }}-php-${{ steps.extension-hash.outputs.hash }}
 
     - name: Cache extensions
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ${{ steps.extcache.outputs.dir }}
         key: ${{ runner.os }}-php-${{ steps.extension-hash.outputs.hash }}
@@ -188,7 +188,7 @@ runs:
 
     - name: Restore Composer cache
       id: composer-cache
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: ${{ env.COMPOSER_CACHE_DIR }}
         key: ${{ runner.os }}-composer-${{ inputs.php-version }}-${{ hashFiles(inputs.cache-dependency-path) }}
@@ -206,7 +206,7 @@ runs:
       working-directory: ${{ inputs.working-directory }}
 
     - name: Save Composer cache
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: ${{ env.COMPOSER_CACHE_DIR }}
         key: ${{ steps.composer-cache.outputs.cache-primary-key }}
