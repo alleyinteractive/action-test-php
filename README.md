@@ -22,7 +22,7 @@ jobs:
     timeout-minutes: 10
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Run PHP Tests in src directory
       uses: alleyinteractive/action-test-php@develop
@@ -213,7 +213,7 @@ jobs:
     timeout-minutes: 10
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Run PHP Tests in src directory
       uses: alleyinteractive/action-test-php@develop
@@ -273,7 +273,7 @@ jobs:
     # Name the job in the matrix
     name: "PR Tests PHP ${{ matrix.php }} WordPress ${{ matrix.wordpress }}"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Run General Tests
         # See https://github.com/alleyinteractive/action-test-general for more options
